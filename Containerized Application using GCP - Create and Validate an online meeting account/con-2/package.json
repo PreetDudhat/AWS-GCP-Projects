@@ -1,0 +1,15 @@
+{
+    "name": "login_service",
+    "version": "1.0.0",
+    "description": "Microservice for user login",
+    "main": "login_service.js",
+    "scripts": {
+      "start": "node login_service.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "@google-cloud/firestore": "^2.5.0"
+    }
+    
+  }
+  

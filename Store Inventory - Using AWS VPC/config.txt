@@ -1,0 +1,27 @@
+aws_access_key_id=ASIA2RFGTH4R7M5CZ2SQ
+aws_secret_access_key=GAV33V0quMrJ3d0On5mLFNpFvmVmZ64JcsZcOAxb
+aws_session_token=FwoGZXIvYXdzEP///////////wEaDE0yTAJ7i4onJEIwLyLAAUEgT/QGNSORasW5hPsbBBzGeIVFguKRM/2nh1+niba5gVS4slO1vHr3CiGZjoNaK1K7yzh640i4iRtmEi8mpEPhjGDHmRAtS70rGzQAeUVP8V8cYf95t0fallZj79Sk8On2d2M3Z8/twHml3jlffVBcikbqTZct7gjgo1UFWYEW3RVea570rtRUW9bCa+eSQcE0J1zpwQzF5EcYbKkEVQqYsukTiBAvHydtOlY+PnhJOgJa9USrGbGMqpLRPU+4pijdjaKlBjItbu4w4KaQipvAnQeWfZszgQrv4su0244gsHsCzLZlcAMaHif0BsMFSey3ULmZ
+
+
+change permision of pem file in windows
+ssh -i "test.pem" ec2-user@ec2-18-205-190-83.compute-1.amazonaws.com
+sudo yum update -y
+sudo yum install python3-pip -y
+sudo pip3 install flask boto3 pymysql
+sudo yum install mariadb
+sudo python3 app.py
+
+mysql -h database-1-instance-1.csumk5xlgu06.us-east-1.rds.amazonaws.com -P 3306 -u admin -p
+
+
+Other cmd: scp -i "D:/Cloud/A3 - Network/testkey.pem" app.py ec2-user@54.91.235.208:/home/ec2-user/app.py
+
+{
+	"banner": "B00913117",
+	"ip": "54.91.235.208",
+	"ec2_instance_id": "i-0c4852e93b9aa97e8",
+	"rds_instance_id": "database-1-instance-1",
+	"aws_access_key_id" = "ASIASAWFVLWS7RU4SGV6"
+	"aws_secret_access_key" = "0aKx/YsTet0358nLmPVF6XuXmJHyd1EBiHFUFsec"
+	"aws_session_token_id" = "FwoGZXIvYXdzEAEaDGBDjddpwXXZE7pO1yLAAeUXpqUMdEAEY4WUorihOn30rxTEzZsDwpJpMWnDY/LGMfl1CXbL6KeRVp/BglLSq+eLP035YzACNoex5tZ/YFtMQgdnHHgK0ddVV1za9rM+oNQN4ExF2AwoW+fmz/3CBGCiPgfNNFhKbYVlxaZQSv1YmU3+XPpekk+Ut9OkiJGEzZOYFb2hfD6DniAU/D6ywiBXmHvhqjlSMtzqG9UC+U5Bq7xpeFvz36E77Y2kR8oUtn/ryxnAFdIhMe3x+PbhAyjMvKKlBjItDA5e4UpJwuOV/Jb6ApXERz6rqpUOpdZUlcEGeUK4cuhNvWhPKXZhKng7LK/U"
+}

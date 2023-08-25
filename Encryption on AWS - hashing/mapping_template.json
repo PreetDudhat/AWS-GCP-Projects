@@ -1,0 +1,5 @@
+{
+    "stateMachineArn" : "arn:aws:states:us-east-1:138927234469:stateMachine:MyStateMachine",
+    "input": $input.json('$.input'),
+    "name": $input.json('$.name')
+}

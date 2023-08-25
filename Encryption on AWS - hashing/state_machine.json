@@ -1,0 +1,48 @@
+{
+    "Comment": "A State Machine to handle different hashing operations",
+    "StartAt": "ChoiceState",
+    "States": {
+      "ChoiceState": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.action",
+            "StringEquals": "sha256",
+            "Next": "SHA256Function"
+          },
+          {
+            "Variable": "$.action",
+            "StringEquals": "md5",
+            "Next": "MD5Function"
+          },
+          {
+            "Variable": "$.action",
+            "StringEquals": "bcrypt",
+            "Next": "BcryptFunction"
+          }
+        ],
+        "Default": "DefaultState"
+      },
+      "SHA256Function": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:us-east-1:138927234469:function:SHA256Function",
+        "End": true
+      },
+      "MD5Function": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:us-east-1:138927234469:function:MD5",
+        "End": true
+      },
+      "BcryptFunction": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:us-east-1:138927234469:function:bcrypt",
+        "End": true
+      },
+      "DefaultState": {
+        "Type": "Fail",
+        "Error": "DefaultStateError",
+        "Cause": "No matches!"
+      }
+    }
+  }
+  

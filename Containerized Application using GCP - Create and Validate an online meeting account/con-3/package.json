@@ -1,0 +1,15 @@
+{
+    "name": "state_service",
+    "version": "1.0.0",
+    "description": "Microservice for user state management",
+    "main": "state_service.js",
+    "scripts": {
+      "start": "node state_service.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "@google-cloud/firestore": "^2.5.0"
+    }
+    
+  }
+  

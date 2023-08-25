@@ -1,0 +1,163 @@
+Resources:
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-0f9ce67dcf718d332
+      InstanceType: t2.micro
+      KeyName: testkey
+      SecurityGroups:
+        - launch-wizard-1
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          sudo yum update -y
+          sudo yum -y install python3-pip
+          pip3 install Flask
+          pip3 install requests
+          pip3 install boto3
+          sudo yum -y install git
+          git clone https://github.com/PreetDudhat/cloudproject.git
+          cd cloudproject
+          python3 app.py
+      Tags:
+        - Key: Name
+          Value: cloud999inst
+
+  EmailSubscriptionAPI:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties: 
+      Name: EmailSubscription-API
+
+  EmailSubscriptionResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      ParentId: 
+        Fn::GetAtt:
+          - EmailSubscriptionAPI
+          - RootResourceId
+      PathPart: 'EmailSub'
+      RestApiId: 
+        Ref: EmailSubscriptionAPI
+
+  EmailSubscriptionMethod:
+    Type: 'AWS::ApiGateway::Method'
+    DependsOn:
+      - MyLambdaPermission
+    Properties:
+      RestApiId: !Ref EmailSubscriptionAPI
+      ResourceId: !Ref EmailSubscriptionResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateSNSLambdaFunction.Arn}/invocations"
+        IntegrationResponses:
+          - StatusCode: "200"
+            ResponseParameters:
+              "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              "method.response.header.Access-Control-Allow-Methods": "'POST,OPTIONS'"
+              "method.response.header.Access-Control-Allow-Origin": "'*'"
+      MethodResponses:
+        - StatusCode: "200"
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+            "method.response.header.Access-Control-Allow-Methods": "'POST,OPTIONS'"
+            "method.response.header.Access-Control-Allow-Origin": "'*'"
+        - StatusCode: "400"
+        
+  Deployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn: EmailSubscriptionMethod
+    Properties:
+      RestApiId: 
+        Ref: EmailSubscriptionAPI
+      StageName: prod
+
+  MyLambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt CreateSNSLambdaFunction.Arn
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EmailSubscriptionAPI}/*/POST/EmailSub"
+
+  CreateSNSLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: EmailSub
+      Runtime: python3.10
+      Handler: index.lambda_handler
+      Role: 'arn:aws:iam::138927234469:role/LabRole'
+      Timeout: 60
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+
+          def lambda_handler(event, context):
+                # Initialize the boto3 client for SNS
+                sns_client = boto3.client('sns', region_name='us-east-1') # replace with your region
+
+                # Get the email from the POST request
+                email = json.loads(event['body'])['email']
+
+                # Create a new SNS topic
+                response = sns_client.create_topic(Name='EmailSubscription')
+                topic_arn = response['TopicArn']
+
+                # Create an email subscription to the topic
+                subscription = sns_client.subscribe(
+                    TopicArn=topic_arn,
+                    Protocol='email',
+                    Endpoint=email
+                )
+
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps('Subscription created successfully!')
+                }
+
+  Secret:
+    Type: 'AWS::SecretsManager::Secret'
+    Properties:
+      Name: myurl
+      SecretString: 
+        Fn::Sub:
+          - https://${restApiId}.execute-api.${region}.amazonaws.com/prod
+          - restApiId: 
+              Ref: EmailSubscriptionAPI
+            region: 
+              Ref: AWS::Region
+              
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    DependsOn:
+      - LambdaPermission
+    Properties:
+      BucketName: mytextgen
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt Textgen1LambdaFunction.Arn
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref Textgen1LambdaFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub 'arn:aws:s3:::mytextgen'
+      SourceAccount: !Ref AWS::AccountId
+      
+  Textgen1LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: textgen1
+      Handler: index.lambda_handler
+      Role: 'arn:aws:iam::138927234469:role/LabRole'
+      Runtime: python3.10
+      Code: 
+        S3Bucket: mycode21
+        S3Key: package.zip
+      Timeout: 60

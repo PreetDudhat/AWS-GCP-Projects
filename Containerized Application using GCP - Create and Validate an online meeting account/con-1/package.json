@@ -1,0 +1,14 @@
+{
+    "name": "registration_service",
+    "version": "1.0.0",
+    "description": "Microservice for user registration",
+    "main": "registration_service.js",
+    "scripts": {
+      "start": "node registration_service.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "@google-cloud/firestore": "^2.5.0"
+    }    
+}
+  
